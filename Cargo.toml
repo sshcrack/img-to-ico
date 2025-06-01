@@ -1,0 +1,14 @@
+[package]
+name = "img-to-ico"
+version = "0.1.0"
+edition = "2024"
+description = "A Rust library to convert images to ICO format."
+license = "MIT OR Apache-2.0"
+authors = ["sshcrack"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+image = "0.25.6"
+wasm-bindgen = "0.2.100"

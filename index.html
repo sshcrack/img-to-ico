@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8" />
+    <title>hello-wasm example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        #result-image {
+            max-width: 100%;
+            border: 1px solid #ccc;
+            display: none;
+        }
+
+        .file-input {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Image to ICO Converter</h1>
+        <div class="file-input">
+            <label for="image-input">Select an image file:</label>
+            <input type="file" id="image-input" accept="image/*">
+        </div>
+        <div>
+            <img id="result-image" alt="Converted ICO">
+            <p id="status"></p>
+        </div>
+    </div>
+
+    <script type="module">
+        import init, { convert_to_ico } from "./pkg/img_to_ico.js";
+
+        init().then(() => {
+            const fileInput = document.getElementById('image-input');
+            const resultImage = document.getElementById('result-image');
+            const statusEl = document.getElementById('status');
+
+            fileInput.addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                statusEl.textContent = 'Converting...';
+                resultImage.style.display = 'none';
+
+                try {
+                    // Read the file as ArrayBuffer
+                    const arrayBuffer = await file.arrayBuffer();
+                    // Convert to Uint8Array
+                    const uint8Array = new Uint8Array(arrayBuffer);
+                    // Check file size
+                    if (uint8Array.length > 1024 * 1024) {
+                        statusEl.textContent = 'Error: File size exceeds 1MB limit';
+                        return;
+                    }
+
+                    // Call the Wasm function
+                    const icoData = convert_to_ico(uint8Array, file.type);
+
+                    // Create a blob URL from the returned data
+                    const blob = new Blob([icoData], { type: 'image/x-icon' });
+                    const url = URL.createObjectURL(blob);
+
+                    // Display the image
+                    resultImage.src = url;
+                    resultImage.style.display = 'block';
+                    statusEl.textContent = 'Conversion complete!';
+                } catch (error) {
+                    console.log(error)
+                    console.error('Error converting image:', error);
+                    statusEl.textContent = 'Error: ' + error;
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
