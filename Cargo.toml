@@ -5,6 +5,7 @@ edition = "2024"
 description = "A Rust library to convert images to ICO format."
 license = "MIT OR Apache-2.0"
 authors = ["sshcrack"]
+repository = "https://github.com/sshcrack/img-to-ico"
 
 [lib]
 crate-type = ["cdylib"]
